@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     # Demo test
     dim = 128
-    features = torch.randn(num_nodes, dim)  # 假设有3个节点，每个节点有3维特征
-    model = GraphSAGEConv(dim, order=2)
-    embeds = model(graph, features)
+    features = torch.randn(num_nodes, dim)
+    graph_gcn = GraphSAGEConv(dim, order=2)
+    embeds = graph_gcn(graph, features)
     print(embeds.shape)
