@@ -17,8 +17,6 @@ class FactorizationMachine(torch.nn.Module):
 
     def forward(self, x):
         linear_part = self.w0 + torch.matmul(x, self.w).unsqueeze(1)
-
-        # 计算交互部分
         sum_of_vx = torch.matmul(x, self.v)
         square_of_sum_vx = torch.sum(sum_of_vx ** 2, dim=1, keepdim=True)
         sum_of_square_vx = torch.sum(torch.matmul(x ** 2, self.v ** 2), dim=1, keepdim=True)

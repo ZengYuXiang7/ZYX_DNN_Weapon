@@ -2,6 +2,7 @@
 # Author : yuxiang Zeng
 import torch
 
+
 class ExternalAttention(torch.nn.Module):
 
     def __init__(self, d_model, S=64):

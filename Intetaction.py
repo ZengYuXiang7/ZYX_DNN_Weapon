@@ -3,9 +3,9 @@
 import torch
 
 
-class Inner_product(torch.nn.Module):
+class InnerOroduct(torch.nn.Module):
     def __init__(self):
-        super(Inner_product, self).__init__()
+        super(InnerOroduct, self).__init__()
         pass
 
     def forward(self, a, b):
@@ -14,9 +14,9 @@ class Inner_product(torch.nn.Module):
         return outputs
 
 
-class Outer_product(torch.nn.Module):
+class OuterProduct(torch.nn.Module):
     def __init__(self):
-        super(Outer_product, self).__init__()
+        super(OuterProduct, self).__init__()
 
     def forward(self, a, b):
         if a.dim() != 2 or b.dim() != 2:
@@ -25,9 +25,9 @@ class Outer_product(torch.nn.Module):
         return outputs
 
 
-class DNN_interaction(torch.nn.Module):
+class DNNInteraction(torch.nn.Module):
     def __init__(self, dim):
-        super(DNN_interaction, self).__init__()
+        super(DNNInteraction, self).__init__()
         self.input_dim = dim
         self.NeuCF = torch.nn.Sequential(
             torch.nn.Linear(self.input_dim, self.input_dim // 2),  # FFN
@@ -45,9 +45,9 @@ class DNN_interaction(torch.nn.Module):
         return outputs.flatten()
 
 
-class Light_dnn(torch.nn.Module):
+class LightDnn(torch.nn.Module):
     def __init__(self, dim):
-        super(Light_dnn, self).__init__()
+        super(LightDnn, self).__init__()
         self.dim = dim
         self.transfer_a = torch.nn.Linear(self.dim, self.dim)
         self.transfer_b = torch.nn.Linear(self.dim, self.dim)
@@ -61,9 +61,9 @@ class Light_dnn(torch.nn.Module):
         return outputs
 
 
-class CNN_interaction(torch.nn.Module):
+class CNNInteraction(torch.nn.Module):
     def __init__(self, input_channels, output_channels, kernel_size):
-        super(CNN_interaction, self).__init__()
+        super(CNNInteraction, self).__init__()
         # 定义卷积层
         self.layer_1 = torch.nn.Conv2d(input_channels, output_channels, kernel_size)
         # 可以添加更多层和其他组件，如批量归一化、激活函数等
@@ -80,18 +80,18 @@ if __name__ == '__main__':
     inputs_1 = torch.randn(bs, dim)
     inputs_2 = torch.randn(bs, dim)
 
-    inner_product = Inner_product()
+    inner_product = InnerOroduct()
     outputs = inner_product(inputs_1, inputs_2)
     print("内积输出形状:", outputs.shape)
 
-    outer_product = Outer_product()
+    outer_product = OuterProduct()
     outputs = outer_product(inputs_1, inputs_2)
     print("外积输出形状:", outputs.shape)
 
-    dnn_interaction = DNN_interaction(inputs_1.shape[1])
+    dnn_interaction = DNNInteraction(inputs_1.shape[1])
     outputs = dnn_interaction(inputs_1)
     print("DNN输出形状:", outputs.shape)
 
-    light_dnn = Light_dnn(inputs_1.shape[1])
+    light_dnn = LightDnn(inputs_1.shape[1])
     outputs = light_dnn(inputs_1, inputs_2)
     print("Light_dnn输出形状:", outputs.shape)
