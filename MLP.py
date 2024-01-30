@@ -17,6 +17,6 @@ if __name__ == '__main__':
     bs = 64
     input_size, hidden_size, output_size = 64, 128, 64
     ffn = FFN(input_size, hidden_size, output_size)
-    inputs = torch.randn(64, input_size)
+    inputs = torch.randn(bs, input_size)
     outputs = ffn(inputs)
     print(outputs.shape)
