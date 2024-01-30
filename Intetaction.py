@@ -55,9 +55,24 @@ class Light_dnn(torch.nn.Module):
     def forward(self, a, b):
         a = self.transfer_a(a)
         b = self.transfer_b(b)
+
         outputs = a * b
         outputs = outputs.sum(dim=-1)
         return outputs
+
+
+class CNN_interaction(torch.nn.Module):
+    def __init__(self, input_channels, output_channels, kernel_size):
+        super(CNN_interaction, self).__init__()
+        # 定义卷积层
+        self.layer_1 = torch.nn.Conv2d(input_channels, output_channels, kernel_size)
+        # 可以添加更多层和其他组件，如批量归一化、激活函数等
+
+    def forward(self, x):
+        # 通过卷积层
+        x = self.layer_1(x)
+        # 可以添加激活函数、池化层等
+        return x
 
 
 if __name__ == '__main__':
@@ -79,4 +94,4 @@ if __name__ == '__main__':
 
     light_dnn = Light_dnn(inputs_1.shape[1])
     outputs = light_dnn(inputs_1, inputs_2)
-    print("light_dnn输出形状:", outputs.shape)
+    print("Light_dnn输出形状:", outputs.shape)
