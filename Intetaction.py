@@ -10,7 +10,7 @@ class Inner_product(torch.nn.Module):
 
     def forward(self, a, b):
         outputs = a * b
-        outputs = outputs.sum(dim = -1)
+        outputs = outputs.sum(dim=-1)
         return outputs
 
 
@@ -30,13 +30,13 @@ class DNN_interaction(torch.nn.Module):
         super(DNN_interaction, self).__init__()
         self.input_dim = dim
         self.NeuCF = torch.nn.Sequential(
-            torch.nn.Linear(self.input_dim, self.input_dim // 2),       # FFN
-            torch.nn.LayerNorm(self.input_dim // 2),                    # LayerNorm
-            torch.nn.ReLU(),                                            # ReLU
+            torch.nn.Linear(self.input_dim, self.input_dim // 2),  # FFN
+            torch.nn.LayerNorm(self.input_dim // 2),  # LayerNorm
+            torch.nn.ReLU(),  # ReLU
             torch.nn.Linear(self.input_dim // 2, self.input_dim // 2),  # FFN
-            torch.nn.LayerNorm(self.input_dim // 2),                    # LayerNorm
-            torch.nn.ReLU(),                                            # ReLU
-            torch.nn.Linear(self.input_dim // 2, 1)          # y
+            torch.nn.LayerNorm(self.input_dim // 2),  # LayerNorm
+            torch.nn.ReLU(),  # ReLU
+            torch.nn.Linear(self.input_dim // 2, 1)  # y
         )
 
     def forward(self, x):
@@ -44,6 +44,20 @@ class DNN_interaction(torch.nn.Module):
         outputs = torch.sigmoid(outputs)
         return outputs.flatten()
 
+
+class Light_dnn(torch.nn.Module):
+    def __init__(self, dim):
+        super(Light_dnn, self).__init__()
+        self.dim = dim
+        self.transfer_a = torch.nn.Linear(self.dim, self.dim)
+        self.transfer_b = torch.nn.Linear(self.dim, self.dim)
+
+    def forward(self, a, b):
+        a = self.transfer_a(a)
+        b = self.transfer_b(b)
+        outputs = a * b
+        outputs = outputs.sum(dim=-1)
+        return outputs
 
 
 if __name__ == '__main__':
@@ -62,3 +76,7 @@ if __name__ == '__main__':
     dnn_interaction = DNN_interaction(inputs_1.shape[1])
     outputs = dnn_interaction(inputs_1)
     print("DNN输出形状:", outputs.shape)
+
+    light_dnn = Light_dnn(inputs_1.shape[1])
+    outputs = light_dnn(inputs_1, inputs_2)
+    print("light_dnn输出形状:", outputs.shape)
