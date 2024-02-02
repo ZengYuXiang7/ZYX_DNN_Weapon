@@ -217,7 +217,6 @@ def adjacency(edges, weights, n):
 
     returns: a scipy.sparse adjacency matrix with unit weight self loops for edges with the given weights
     """
-
     dictionary = {tuple(item): index for index, item in enumerate(edges)}
     edges = [list(itm) for itm in dictionary.keys()]
     organised = []
@@ -230,7 +229,6 @@ def adjacency(edges, weights, n):
     edges, weights = np.array(edges), np.array(organised)
     adj = sp.coo_matrix((weights, (edges[:, 0], edges[:, 1])), shape=(n, n), dtype=np.float32)
     adj = adj + sp.eye(n)
-
     A = symnormalise(sp.csr_matrix(adj, dtype=np.float32))
     A = ssm2tst(A)
     return A
@@ -247,13 +245,10 @@ def symnormalise(M):
     D^{-1/2} M D^{-1/2}
     where D is the diagonal node-degree matrix
     """
-
     d = np.array(M.sum(1))
-
     dhi = np.power(d, -1 / 2).flatten()
     dhi[np.isinf(dhi)] = 0.
     DHI = sp.diags(dhi)  # D half inverse i.e. D^{-1/2}
-
     return (DHI.dot(M)).dot(DHI)
 
 
@@ -267,13 +262,10 @@ def ssm2tst(M):
     returns:
     a torch sparse tensor of M
     """
-
     M = M.tocoo().astype(np.float32)
-
     indices = torch.from_numpy(np.vstack((M.row, M.col))).long()
     values = torch.from_numpy(M.data)
     shape = torch.Size(M.shape)
-
     return torch.sparse.FloatTensor(indices, values, shape)
 
 
@@ -295,15 +287,7 @@ if __name__ == '__main__':
     V = 5  # 顶点数
     E = {0: [0, 1], 1: [1, 2], 2: [2, 3], 3: [3, 4]}  # 边集
     X = torch.randn(V, args.d)  # 随机生成特征
-
-    # 实例化HyperGCN模型
     model = HyperGCN(V, E, X, args)
-
-    # 模拟输入数据
-    H = torch.randn(V, args.d)  # 随机生成输入特征
-
-    # 前向传播
-    output = model(H)
-
-    # 打印输出
-    print("模型输出:", output.shape)
+    inputs = torch.randn(V, args.d)
+    outputs = model(inputs)
+    print("模型输出:", outputs.shape)
