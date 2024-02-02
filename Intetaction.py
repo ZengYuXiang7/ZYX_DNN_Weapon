@@ -49,15 +49,12 @@ class LightDnn(torch.nn.Module):
     def __init__(self, dim):
         super(LightDnn, self).__init__()
         self.dim = dim
-        self.transfer_a = torch.nn.Linear(self.dim, self.dim)
-        self.transfer_b = torch.nn.Linear(self.dim, self.dim)
+        self.transfer = torch.nn.Linear(self.dim, self.dim)
 
     def forward(self, a, b):
-        a = self.transfer_a(a)
-        b = self.transfer_b(b)
-
         outputs = a * b
-        outputs = outputs.sum(dim=-1)
+        outputs = self.transfer(outputs)
+        outputs = outputs.sum(dim=-1).sigmoid()
         return outputs
 
 

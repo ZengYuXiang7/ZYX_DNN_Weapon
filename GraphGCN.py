@@ -32,6 +32,7 @@ if __name__ == '__main__':
     src_nodes = torch.randint(0, num_nodes, (num_edges,))
     dst_nodes = torch.randint(0, num_nodes, (num_edges,))
     graph = dgl.graph((src_nodes, dst_nodes))
+    dgl.add_self_loop(graph)
 
     # Demo test
     dim = 128
