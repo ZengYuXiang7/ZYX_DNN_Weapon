@@ -7,6 +7,9 @@ from node2vec import Node2Vec
 
 
 def get_graph_embedding(graph, dim=32, length=10, walk=20, windows=3, epochs=20, bs=32, random_state=2024):
+    # p=1, q=0.5, n_clusters=6。DFS深度优先搜索，挖掘同质社群
+    # p=1, q=2,   n_clusters=3。BFS宽度优先搜索，挖掘节点的结构功能。
+
     graph = graph.to_networkx()
 
     node2vec = Node2Vec(
@@ -18,9 +21,6 @@ def get_graph_embedding(graph, dim=32, length=10, walk=20, windows=3, epochs=20,
         num_walks=walk,  # 每个节点作为起始节点生成的随机游走个数
         workers=1,  # 并行线程数
     )
-
-    # p=1, q=0.5, n_clusters=6。DFS深度优先搜索，挖掘同质社群
-    # p=1, q=2,   n_clusters=3。BFS宽度优先搜索，挖掘节点的结构功能。
 
     # 训练Node2Vec
     model = node2vec.fit(
