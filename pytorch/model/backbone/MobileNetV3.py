@@ -293,11 +293,11 @@ def _gen_mobilenet_v3_rw(variant, channel_multiplier=1.0, pretrained=False, **kw
     """
     arch_def = [
         # stage 0, 112x112 in
-        ['ds_r1_k3_s1_e1_c16_nre_noskip'],  # relu
+        ['ds_r1_k3_s1_e1_c16_nre_noskip'],  # act
         # stage 1, 112x112 in
-        ['ir_r1_k3_s2_e4_c24_nre', 'ir_r1_k3_s1_e3_c24_nre'],  # relu
+        ['ir_r1_k3_s2_e4_c24_nre', 'ir_r1_k3_s1_e3_c24_nre'],  # act
         # stage 2, 56x56 in
-        ['ir_r3_k5_s2_e3_c40_se0.25_nre'],  # relu
+        ['ir_r3_k5_s2_e3_c40_se0.25_nre'],  # act
         # stage 3, 28x28 in
         ['ir_r1_k3_s2_e6_c80', 'ir_r1_k3_s1_e2.5_c80', 'ir_r2_k3_s1_e2.3_c80'],  # hard-swish
         # stage 4, 14x14in
@@ -329,7 +329,7 @@ def _gen_mobilenet_v3(variant, channel_multiplier=1.0, pretrained=False, **kwarg
     if 'small' in variant:
         num_features = 1024
         if 'minimal' in variant:
-            act_layer = resolve_act_layer(kwargs, 'relu')
+            act_layer = resolve_act_layer(kwargs, 'act')
             arch_def = [
                 # stage 0, 112x112 in
                 ['ds_r1_k3_s2_e1_c16'],
@@ -348,9 +348,9 @@ def _gen_mobilenet_v3(variant, channel_multiplier=1.0, pretrained=False, **kwarg
             act_layer = resolve_act_layer(kwargs, 'hard_swish')
             arch_def = [
                 # stage 0, 112x112 in
-                ['ds_r1_k3_s2_e1_c16_se0.25_nre'],  # relu
+                ['ds_r1_k3_s2_e1_c16_se0.25_nre'],  # act
                 # stage 1, 56x56 in
-                ['ir_r1_k3_s2_e4.5_c24_nre', 'ir_r1_k3_s1_e3.67_c24_nre'],  # relu
+                ['ir_r1_k3_s2_e4.5_c24_nre', 'ir_r1_k3_s1_e3.67_c24_nre'],  # act
                 # stage 2, 28x28 in
                 ['ir_r1_k5_s2_e4_c40_se0.25', 'ir_r2_k5_s1_e6_c40_se0.25'],  # hard-swish
                 # stage 3, 14x14 in
@@ -363,7 +363,7 @@ def _gen_mobilenet_v3(variant, channel_multiplier=1.0, pretrained=False, **kwarg
     else:
         num_features = 1280
         if 'minimal' in variant:
-            act_layer = resolve_act_layer(kwargs, 'relu')
+            act_layer = resolve_act_layer(kwargs, 'act')
             arch_def = [
                 # stage 0, 112x112 in
                 ['ds_r1_k3_s1_e1_c16'],
@@ -384,11 +384,11 @@ def _gen_mobilenet_v3(variant, channel_multiplier=1.0, pretrained=False, **kwarg
             act_layer = resolve_act_layer(kwargs, 'hard_swish')
             arch_def = [
                 # stage 0, 112x112 in
-                ['ds_r1_k3_s1_e1_c16_nre'],  # relu
+                ['ds_r1_k3_s1_e1_c16_nre'],  # act
                 # stage 1, 112x112 in
-                ['ir_r1_k3_s2_e4_c24_nre', 'ir_r1_k3_s1_e3_c24_nre'],  # relu
+                ['ir_r1_k3_s2_e4_c24_nre', 'ir_r1_k3_s1_e3_c24_nre'],  # act
                 # stage 2, 56x56 in
-                ['ir_r3_k5_s2_e3_c40_se0.25_nre'],  # relu
+                ['ir_r3_k5_s2_e3_c40_se0.25_nre'],  # act
                 # stage 3, 28x28 in
                 ['ir_r1_k3_s2_e6_c80', 'ir_r1_k3_s1_e2.5_c80', 'ir_r2_k3_s1_e2.3_c80'],  # hard-swish
                 # stage 4, 14x14in

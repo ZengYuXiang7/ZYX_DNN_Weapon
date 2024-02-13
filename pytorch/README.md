@@ -2330,7 +2330,7 @@ from torch import nn
 from torch.nn import functional as F
 
 input=torch.randn(1,64,7,7)
-#conv+bn
+#conv+norm
 conv1=nn.Conv2d(64,64,3,padding=1)
 bn1=nn.BatchNorm2d(64)
 bn1.eval()

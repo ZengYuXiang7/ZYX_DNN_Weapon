@@ -39,7 +39,7 @@ class RepMLP(nn.Module):
             if(not self.deploy):
                 self.avg=nn.Sequential(OrderedDict([
                     ('avg',nn.AvgPool2d(kernel_size=(self.h,self.w))),
-                    ('bn',nn.BatchNorm2d(num_features=C))
+                    ('norm',nn.BatchNorm2d(num_features=C))
                 ])
                 )
             else:
@@ -47,7 +47,7 @@ class RepMLP(nn.Module):
             hidden_dim=self.C//self.fc1_fc2_reduction
             self.fc1_fc2=nn.Sequential(OrderedDict([
                 ('fc1',nn.Linear(C*self.h_part*self.w_part,hidden_dim)),
-                ('relu',nn.ReLU()),
+                ('act',nn.ReLU()),
                 ('fc2',nn.Linear(hidden_dim,C*self.h_part*self.w_part))
             ])
             )
@@ -59,7 +59,7 @@ class RepMLP(nn.Module):
             for k in self.repconv_kernels:
                 repconv=nn.Sequential(OrderedDict([
                     ('conv',nn.Conv2d(self.C,self.O,kernel_size=k,padding=(k-1)//2, groups=fc3_groups,bias=False)),
-                    ('bn',nn.BatchNorm2d(self.O))
+                    ('norm',nn.BatchNorm2d(self.O))
                 ])
 
                 )
@@ -73,7 +73,7 @@ class RepMLP(nn.Module):
         if(self.repconv_kernels is not None):
             for k in self.repconv_kernels:
                 self.__delattr__('repconv{}'.format(k))
-        #del fc3,bn
+        #del fc3,norm
         self.__delattr__('fc3')
         self.__delattr__('fc3_bn')
         self.fc3 = nn.Conv2d(self.C * self.h * self.w, self.O * self.h * self.w, 1, 1, 0, bias=True, groups=self.fc3_groups)
@@ -93,17 +93,17 @@ class RepMLP(nn.Module):
 
 
     def get_equivalent_fc1_fc3_params(self):
-        #training fc3+bn weight
+        #training fc3+norm weight
         fc_weight,fc_bias=self._fuse_bn(self.fc3,self.fc3_bn)
         #training conv weight
         if(self.repconv_kernels is not None):
             max_kernel=max(self.repconv_kernels)
             max_branch=self.__getattr__('repconv{}'.format(max_kernel))
-            conv_weight,conv_bias=self._fuse_bn(max_branch.conv,max_branch.bn)
+            conv_weight,conv_bias=self._fuse_bn(max_branch.conv, max_branch.norm)
             for k in self.repconv_kernels:
                 if(k!=max_kernel):
                     tmp_branch=self.__getattr__('repconv{}'.format(k))
-                    tmp_weight,tmp_bias=self._fuse_bn(tmp_branch.conv,tmp_branch.bn)
+                    tmp_weight,tmp_bias=self._fuse_bn(tmp_branch.conv, tmp_branch.norm)
                     tmp_weight=F.pad(tmp_weight,[(max_kernel-k)//2]*4)
                     conv_weight+=tmp_weight
                     conv_bias+=tmp_bias

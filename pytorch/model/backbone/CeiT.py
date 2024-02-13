@@ -279,7 +279,7 @@ class CeIT(nn.Module):
             - hybrid_backbone (:obj:`nn.Module`): backbone e.g. resnet
             - norm_layer (:obj:`nn.Module`): normalization type
             - leff_local_size (:obj:`int`): kernel size in LocallyEnhancedFeedForward
-            - leff_with_bn (:obj:`bool`): whether add bn in LocallyEnhancedFeedForward
+            - leff_with_bn (:obj:`bool`): whether add norm in LocallyEnhancedFeedForward
         """
         super().__init__()
         self.num_classes = num_classes

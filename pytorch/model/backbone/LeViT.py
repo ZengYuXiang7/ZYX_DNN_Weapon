@@ -91,7 +91,7 @@ class Conv2d_BN(torch.nn.Sequential):
         bn = torch.nn.BatchNorm2d(b)
         torch.nn.init.constant_(bn.weight, bn_weight_init)
         torch.nn.init.constant_(bn.bias, 0)
-        self.add_module('bn', bn)
+        self.add_module('norm', bn)
 
         global FLOPS_COUNTER
         output_points = ((resolution + 2 * pad - dilation *
@@ -119,7 +119,7 @@ class Linear_BN(torch.nn.Sequential):
         bn = torch.nn.BatchNorm1d(b)
         torch.nn.init.constant_(bn.weight, bn_weight_init)
         torch.nn.init.constant_(bn.bias, 0)
-        self.add_module('bn', bn)
+        self.add_module('norm', bn)
 
         global FLOPS_COUNTER
         output_points = resolution**2
@@ -146,7 +146,7 @@ class Linear_BN(torch.nn.Sequential):
 class BN_Linear(torch.nn.Sequential):
     def __init__(self, a, b, bias=True, std=0.02):
         super().__init__()
-        self.add_module('bn', torch.nn.BatchNorm1d(a))
+        self.add_module('norm', torch.nn.BatchNorm1d(a))
         l = torch.nn.Linear(a, b, bias=bias)
         trunc_normal_(l.weight, std=std)
         if bias:

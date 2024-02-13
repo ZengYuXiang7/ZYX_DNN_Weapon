@@ -16,8 +16,8 @@ class SKAttention(nn.Module):
             self.convs.append(
                 nn.Sequential(OrderedDict([
                     ('conv',nn.Conv2d(channel,channel,kernel_size=k,padding=k//2,groups=group)),
-                    ('bn',nn.BatchNorm2d(channel)),
-                    ('relu',nn.ReLU())
+                    ('norm',nn.BatchNorm2d(channel)),
+                    ('act',nn.ReLU())
                 ]))
             )
         self.fc=nn.Linear(channel,self.d)

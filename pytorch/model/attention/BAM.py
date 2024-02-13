@@ -20,8 +20,8 @@ class ChannelAttention(nn.Module):
         self.ca.add_module('flatten',Flatten())
         for i in range(len(gate_channels)-2):
             self.ca.add_module('fc%d'%i,nn.Linear(gate_channels[i],gate_channels[i+1]))
-            self.ca.add_module('bn%d'%i,nn.BatchNorm1d(gate_channels[i+1]))
-            self.ca.add_module('relu%d'%i,nn.ReLU())
+            self.ca.add_module('norm%d'%i,nn.BatchNorm1d(gate_channels[i+1]))
+            self.ca.add_module('act%d'%i,nn.ReLU())
         self.ca.add_module('last_fc',nn.Linear(gate_channels[-2],gate_channels[-1]))
         
 

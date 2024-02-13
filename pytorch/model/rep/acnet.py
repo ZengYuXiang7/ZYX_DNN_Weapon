@@ -15,7 +15,7 @@ def setup_seed(seed):
 def _conv_bn(input_channel,output_channel,kernel_size=3,padding=1,stride=1,groups=1):
      res=nn.Sequential()
      res.add_module('conv',nn.Conv2d(in_channels=input_channel,out_channels=output_channel,kernel_size=kernel_size,padding=padding,padding_mode='zeros',stride=stride,groups=groups,bias=False))
-     res.add_module('bn',nn.BatchNorm2d(output_channel))
+     res.add_module('norm',nn.BatchNorm2d(output_channel))
      return res
 
 class ACNet(nn.Module):
@@ -94,11 +94,11 @@ class ACNet(nn.Module):
      ### 将卷积和BN的参数融合到一起
      def _fuse_conv_bn(self,branch):
           kernel=branch.conv.weight
-          running_mean=branch.bn.running_mean
-          running_var=branch.bn.running_var
-          gamma=branch.bn.weight
-          beta=branch.bn.bias
-          eps=branch.bn.eps
+          running_mean=branch.norm.running_mean
+          running_var=branch.norm.running_var
+          gamma=branch.norm.weight
+          beta=branch.norm.bias
+          eps=branch.norm.eps
           
           std=(running_var+eps).sqrt()
           t=gamma/std

@@ -19,8 +19,8 @@ class Logger:
 
     def __init__(self, args):
         self.args = args
-        makedir('./results/log/')
         if args.experiment:
+            makedir('./results/log/')
             if platform.system() == 'Linux':
                 ts = time.asctime().replace(' ', '_').replace(':', '_')
                 logging.basicConfig(level=logging.INFO, filename=f'./results/log/{args.density}_{args.dimension}_{ts}.log', filemode='w')

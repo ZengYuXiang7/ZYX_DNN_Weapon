@@ -88,7 +88,7 @@ class ConvBN(nn.Sequential):
             super(ConvBN, self).__init__(OrderedDict([
                 ('conv', nn.Conv2d(in_planes, out_planes, kernel_size, stride,
                                 padding=padding, groups=groups, bias=False)),
-                ('bn', nn.BatchNorm2d(out_planes))
+                ('norm', nn.BatchNorm2d(out_planes))
             ]))
         else:
             super(ConvBN, self).__init__(OrderedDict([
@@ -354,7 +354,7 @@ class ConTNet(nn.Module):
         else:
             self.layer0 = nn.Sequential(OrderedDict([
                 ('conv', ConvBN(in_channels, inplanes, kernel_size=7, stride=2, bn=False)),
-                # ('relu', nn.ReLU(inplace=True)),
+                # ('act', nn.ReLU(inplace=True)),
                 ('maxpool', nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
             ]))
 
@@ -415,7 +415,7 @@ class ConTNet(nn.Module):
     def _initialize_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='act')
             elif isinstance(m, nn.Linear):
                 trunc_normal_(m.weight, std=.02)
                 if isinstance(m, nn.Linear) and m.bias is not None:

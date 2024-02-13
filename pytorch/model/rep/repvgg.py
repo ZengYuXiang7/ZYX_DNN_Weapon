@@ -15,7 +15,7 @@ def setup_seed(seed):
 def _conv_bn(input_channel,output_channel,kernel_size=3,padding=1,stride=1,groups=1):
      res=nn.Sequential()
      res.add_module('conv',nn.Conv2d(in_channels=input_channel,out_channels=output_channel,kernel_size=kernel_size,padding=padding,padding_mode='zeros',stride=stride,groups=groups,bias=False))
-     res.add_module('bn',nn.BatchNorm2d(output_channel))
+     res.add_module('norm',nn.BatchNorm2d(output_channel))
      return res
 
 class RepBlock(nn.Module):
