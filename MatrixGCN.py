@@ -4,7 +4,7 @@
 import math
 import torch
 
-from Experiment import get_args
+from run_experiment import get_args
 
 
 class GraphConvolution(torch.torch.nn.Module):
