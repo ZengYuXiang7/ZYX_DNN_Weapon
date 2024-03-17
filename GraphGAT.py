@@ -2,6 +2,7 @@
 # Author : yuxiang Zeng
 import torch
 import numpy as np
+import dgl
 
 class GraphAttentionLayer(torch.nn.Module):
     def __init__(self, in_features, out_features, dropout, alpha, concat=True):
@@ -60,10 +61,42 @@ def generate_random_adjacency_matrix(num_nodes, p=0.5):
     return torch.as_tensor(adjacency_matrix)
 
 
+from dgl.nn.pytorch import GATConv
+
+class GraphGATConv(torch.nn.Module):
+    def __init__(self, in_dim, out_dim, num_heads=1, order=2, dropout=0.1):
+        super(GraphGATConv, self).__init__()
+        self.order = order
+        self.layers = torch.nn.ModuleList([GATConv(in_dim if i == 0 else out_dim * num_heads, out_dim, num_heads=num_heads, feat_drop=dropout) for i in range(order)])
+        self.norms = torch.nn.ModuleList([torch.nn.LayerNorm(out_dim * num_heads) for _ in range(order)])
+        self.acts = torch.nn.ModuleList([torch.nn.ELU() for _ in range(order)])
+
+    def forward(self, graph, features):
+        g = graph
+        feats = features
+        for i, (layer, norm, act) in enumerate(zip(self.layers, self.norms, self.acts)):
+            feats = layer(g, feats).view(feats.size(0), -1)
+            feats = norm(feats)
+            feats = act(feats)
+        return feats
+
+
+
+
 if __name__ == '__main__':
     num_nodes, dim = 100, 128
     graph = generate_random_adjacency_matrix(num_nodes)
     features = torch.randn(num_nodes, dim)
     graph_gat = GraphAttentionLayer(dim, dim, 0, 0.2, True)
     embeds = graph_gat(features, graph)
+    print(embeds.shape)
+
+    num_nodes, num_edges = 100, 200
+    src_nodes = torch.randint(0, num_nodes, (num_edges,))
+    dst_nodes = torch.randint(0, num_nodes, (num_edges,))
+    graph = dgl.graph((src_nodes, dst_nodes))
+    graph = dgl.add_self_loop(graph)
+    features = torch.randn(num_nodes, dim)
+    graph_gat = GraphGATConv(dim, dim, 2, 8, 0.10)
+    embeds = graph_gat(graph, features)
     print(embeds.shape)

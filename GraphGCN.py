@@ -34,12 +34,12 @@ if __name__ == '__main__':
     print(src_nodes.shape, dst_nodes.shape)
 
     graph = dgl.graph((src_nodes, dst_nodes))
-    dgl.add_self_loop(graph)
+    graph = dgl.add_self_loop(graph)
 
     # Demo test
     dim = 128
     bs = 32
-    features = torch.randn(bs, num_nodes, dim)
+    features = torch.randn(num_nodes, dim)
     graph_gcn = GraphSAGEConv(dim, order=2)
     embeds = graph_gcn(graph, features)
     print(embeds.shape)
