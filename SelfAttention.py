@@ -59,9 +59,21 @@ class ScaledDotProductAttention(torch.nn.Module):
         return out
 
 if __name__ == '__main__':
+    from time import time
+
     heads = 8
     bs, n, dim = 64, 5, 128
     inputs = torch.randn(bs, n, dim)
+
+    t1 = time()
     attention = ScaledDotProductAttention(dim, dim, dim, h = heads, dropout=0.1)
     outputs = attention(inputs, inputs, inputs)
-    print(outputs.shape)
+    t2 = time()
+    print(outputs.shape, t2 - t1)
+
+
+    t1 = time()
+    attention = torch.nn.MultiheadAttention(dim, heads, 0.1)
+    outputs, weights = attention(inputs, inputs, inputs)
+    t2 = time()
+    print(outputs.shape, weights.shape, t2 - t1)
