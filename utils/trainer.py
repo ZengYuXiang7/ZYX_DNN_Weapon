@@ -11,6 +11,8 @@ def get_loss_function(args):
         loss_function = t.nn.MSELoss()
     elif args.loss_func == 'SmoothL1Loss':
         loss_function = t.nn.SmoothL1Loss()
+    elif args.loss_func == 'CrossEntropyLoss':
+        loss_function = t.nn.CrossEntropyLoss()
     return loss_function
 
 

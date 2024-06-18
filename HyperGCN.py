@@ -26,6 +26,7 @@ class HyperGCN(torch.nn.Module):
             power = l - i + 2
             if args.dataset == 'citeseer': power = l - i + 4
             h.append(2 ** power)
+
         h.append(c)
 
         if args.fast:
@@ -35,8 +36,7 @@ class HyperGCN(torch.nn.Module):
             reapproximate = True
             structure = E
 
-        self.layers = torch.nn.ModuleList(
-            [HyperGraphConvolution(h[i], h[i + 1], reapproximate, cuda) for i in range(l)])
+        self.layers = torch.nn.ModuleList([HyperGraphConvolution(h[i], h[i + 1], reapproximate, cuda) for i in range(l)])
         self.do, self.l = args.dropout, args.depth
         self.structure, self.m = structure, args.mediators
 

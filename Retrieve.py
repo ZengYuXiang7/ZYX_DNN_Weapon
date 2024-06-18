@@ -14,10 +14,12 @@ class LSH:
     def search_topk_embeds(self, data_base, h_query):
         data_base, h_query = np.array(data_base).astype('float32'), np.array(h_query).astype('float32')
         if not self.is_data_added:
+            self.index.train(data_base)
             self.index.add(data_base)
             self.is_data_added = True
         topk_distance, topk_indices = self.index.search(h_query, self.k)  # 执行Top-K搜索
         return topk_distance, topk_indices
+
 
 class L2Index:
     def __init__(self, k, d):
@@ -29,6 +31,7 @@ class L2Index:
     def search_topk_embeds(self, data_base, h_query):
         data_base, h_query = np.array(data_base).astype('float32'), np.array(h_query).astype('float32')
         if not self.is_data_added:
+            self.index.train(data_base)
             self.index.add(data_base)  # 第一次调用时添加数据
             self.is_data_added = True
         topk_distance, topk_indices = self.index.search(h_query, self.k)  # 执行Top-K搜索
@@ -79,6 +82,7 @@ class IVFPQIndex:
         topk_distance, topk_indices = self.index.search(h_query, self.k)
         return topk_distance, topk_indices
 
+
 class HNSWIndex:
     def __init__(self, k, d):
         self.d = d
@@ -87,6 +91,7 @@ class HNSWIndex:
 
     def search_topk_embeds(self, data_base, h_query):
         data_base, h_query = np.array(data_base).astype('float32'), np.array(h_query).astype('float32')
+        self.index.train(data_base)
         self.index.add(data_base)
         topk_distance, topk_indices = self.index.search(h_query, self.k)
         return topk_distance, topk_indices
@@ -106,33 +111,38 @@ if __name__ == '__main__':
     xb = np.random.random((nb, d))
     xq = np.random.random((nq, d))
 
-    t1 = time()
-    lsh = LSH(k=3, d=d, nbits=d)
-    topk_distence, topk_indices = lsh.search_topk_embeds(xb, xq)
-    t2 = time()
-    print(f'LSH: {t2 - t1 : .2f}s')
+    topk = 3
 
     t1 = time()
-    l2index = L2Index(k=3, d=d)
+    l2index = L2Index(k=topk, d=d)
     topk_distence, topk_indices = l2index.search_topk_embeds(xb, xq)
     t2 = time()
     print(f'L2: {t2 - t1 : .2f}s')
 
     t1 = time()
-    ivfflatindex = IVFFlatIndex(k=3, d=d, nlist=128)
+    lsh = LSH(k=topk, d=d, nbits=d)
+    topk_distence, topk_indices = lsh.search_topk_embeds(xb, xq)
+    t2 = time()
+    print(f'LSH: {t2 - t1 : .2f}s')
+
+    t1 = time()
+    ivfflatindex = IVFFlatIndex(k=topk, d=d, nlist=128)
     topk_distence, topk_indices = ivfflatindex.search_topk_embeds(xb, xq)
     t2 = time()
     print(f'IVFFlat: {t2 - t1 : .2f}s')
 
     t1 = time()
-    ivfpqindex = IVFPQIndex(k=3, d=d, nlist=128, m=8)
+    ivfpqindex = IVFPQIndex(k=topk, d=d, nlist=128, m=8)
     topk_distence, topk_indices = ivfpqindex.search_topk_embeds(xb, xq)
     t2 = time()
     print(f'IVFPQ: {t2 - t1 : .2f}s')
 
     t1 = time()
-    hnswindex = HNSWIndex(k=3, d=d)
+    hnswindex = HNSWIndex(k=topk, d=d)
     topk_distence, topk_indices = hnswindex.search_topk_embeds(xb, xq)
     t2 = time()
     print(f'HNSW: {t2 - t1 : .2f}s')
+
+
+
 

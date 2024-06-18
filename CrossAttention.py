@@ -2,6 +2,22 @@
 # Author : yuxiang Zeng
 import torch
 
+
+class CrossAttention(torch.nn.Module):
+    def __init__(self, first_dim, second_dim, num_heads):
+        super(CrossAttention, self).__init__()
+        self.first_to_second_attention = torch.nn.MultiheadAttention(embed_dim=first_dim, num_heads=num_heads, dropout=0.1)
+        self.second_to_first_attention = torch.nn.MultiheadAttention(embed_dim=second_dim, num_heads=num_heads, dropout=0.1)
+
+    def forward(self, first_features, second_features):
+        first_to_second_attention_output, _ = self.first_to_second_attention(first_features, second_features, second_features)
+        second_to_first_attention_output, _ = self.second_to_first_attention(second_features, first_features, first_features)
+        # 聚合
+        fused_output = torch.cat((first_to_second_attention_output, second_to_first_attention_output), dim=0)
+        fused_output = fused_output.mean(dim=0)  # 假设我们通过取均值来简化处理
+        return fused_output
+
+
 if __name__ == '__main__':
     # 假设的文本和视频特征维度
     text_dim = 128
@@ -14,19 +30,8 @@ if __name__ == '__main__':
     text_features = torch.randn(seq_len, bs, text_dim)
     video_features = torch.randn(seq_len, bs, video_dim)
 
-    text_to_video_attention = torch.nn.MultiheadAttention(embed_dim=text_dim, num_heads=num_heads, dropout=0.1)
-    video_to_text_attention = torch.nn.MultiheadAttention(embed_dim=video_dim, num_heads=num_heads, dropout=0.1)
-
-    text_to_video_attention_output, text_to_video_attention_weights = text_to_video_attention(text_features, video_features, video_features)
-    video_to_text_attention_output, video_to_text_attention_weights = video_to_text_attention(video_features, text_features, text_features)
-
-    print(text_to_video_attention_output.shape, text_to_video_attention_weights.shape)
-    print(video_to_text_attention_output.shape, video_to_text_attention_weights.shape)
-
-    # 聚合
-    fused_output = torch.cat((text_to_video_attention_output, video_to_text_attention_output), dim=0)
-    print(fused_output.shape)
-    fused_output = fused_output.mean(dim=0)  # 假设我们通过取均值来简化处理
+    cross_attention = CrossAttention(128, 128, num_heads)
+    fused_output = cross_attention(text_features, video_features)
     print(fused_output.shape)
 
 
