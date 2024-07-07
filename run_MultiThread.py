@@ -1,27 +1,30 @@
 # coding : utf-8
 # Author : yuxiang Zeng
-
-if __name__ == '__main__':
+def multi_thread_function():
     import os
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    from tqdm import *
-    # function
+    from tqdm import tqdm
+
     def function(inputs):
-        imageTranfer, image_name = inputs
-        file_name = '../BigDataSource/Teddy2024/附件2/ImageData/' + image_name
-        image = Image.open(file_name)
-        features = imageTranfer.image2tensor(image)
-        return features
+        idx, now_input = inputs
+        return idx, now_input + 1
 
+    inputList = [(idx, 0) for (idx, j) in enumerate(range(100000))]
 
-    # input
-    inputList = [(imageTranfer, imageNames) for imageNames in allImages]
-
-    # Execute
-    allImagesFeatures = []
-    allImages = os.listdir('../BigDataSource/Teddy2024/附件2/ImageData')
+    result_list = []
     with ThreadPoolExecutor(max_workers=16) as executor:
         futures = [executor.submit(function, inputs) for inputs in inputList]
-        for future in tqdm(as_completed(futures), total=len(allImages)):
-            allImagesFeatures.append(future.result())
+        for future in tqdm(as_completed(futures), total=len(inputList)):
+            idx, output = future.result()
+            result_list.append([idx, output])
+
+    # Sort result_list by idx
+    final_result = sorted(result_list, key=lambda x: x[0])
     print('Done!')
+    return final_result
+
+
+if __name__ == '__main__':
+    result = multi_thread_function()
+    print(result)
+

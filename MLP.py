@@ -4,9 +4,9 @@
 import torch
 
 
-class FNN(torch.nn.Module):
+class Predictor(torch.nn.Module):
     def __init__(self, input_dim, output_dim, num_layers, dropout):
-        super(FNN, self).__init__()
+        super(Predictor, self).__init__()
         self.num_layers = num_layers
         self.dropout = dropout
         self.dimension = input_dim
