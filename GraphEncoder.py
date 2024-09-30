@@ -28,33 +28,32 @@ class GraphEncoder(torch.nn.Module):
         feats = features
         for i, (layer, norm, act) in enumerate(zip(self.layers, self.norms, self.acts)):
             feats = layer(g, feats)
-            if self.args.graph_encoder == 'gat':
-                feats = feats.mean(dim=1)  # 聚合多个头的输出
+            feats = feats.mean(dim=1) if self.args.graph_encoder == 'gat' else feats
             feats = norm(feats)
             feats = act(feats)
-            if self.args.graph_encoder != 'gat':
-                feats = self.dropout(feats)
-        batch_sizes = torch.as_tensor(g.batch_num_nodes()).to(self.args.device)  # 每个图的节点数
-        first_nodes_idx = torch.cumsum(torch.cat((torch.tensor([0]).to(self.args.device), batch_sizes[:-1])), dim=0)  # 使用torch.cat来连接Tensor
+            feats = self.dropout(feats) if self.args.graph_encoder != 'gat' else feats
+        batch_sizes = torch.as_tensor(g.batch_num_nodes()).to(self.args.device)
+        first_nodes_idx = torch.cumsum(torch.cat((torch.tensor([0]).to(self.args.device), batch_sizes[:-1])), dim=0)
         first_node_features = feats[first_nodes_idx]
         return first_node_features
 
 
+# 添加全局节点在0号位置
 def add_global_nodes(graph):
-    global_node_id = 0  # 将全局节点设置为节点0
-    new_graph = dgl.add_nodes(graph, 1)  # 增加1个新节点
+    global_node_id = 0                                     # 将全局节点设置为节点0
+    new_graph = dgl.add_nodes(graph, 1)               # 增加1个新节点
     all_node_ids = torch.arange(1, new_graph.num_nodes())  # 新节点后所有其他节点
-    new_graph.add_edges(global_node_id, all_node_ids)  # 全局节点 -> 其他节点
-    new_graph.add_edges(all_node_ids, global_node_id)  # 其他节点 -> 全局节点
+    new_graph.add_edges(global_node_id, all_node_ids)      # 全局节点 -> 其他节点
+    new_graph.add_edges(all_node_ids, global_node_id)      # 其他节点 -> 全局节点
     return new_graph
 
 
 def graph_encoder(encoder_type, rank, order):
     args.graph_encoder = encoder_type
-
     u, v = torch.tensor([0, 1, 2]), torch.tensor([1, 2, 3])
     input_dim = rank
     graph = dgl.graph((u, v), num_nodes=4)
+    graph = add_global_nodes(graph)
     graph = dgl.to_bidirected(graph)
     features = torch.randn(graph.num_nodes(), input_dim)
 
@@ -77,4 +76,4 @@ if __name__ == '__main__':
 
     graph_encoder(encoder_type='sage', rank=args.rank, order=args.order)
 
-    graph_encoder(encoder_type='gat', rank=args.rank, order=args.order, heads=4)
+    graph_encoder(encoder_type='gat', rank=args.rank, order=args.order)
