@@ -27,10 +27,12 @@ if __name__ == '__main__':
     # 模拟输入
     bs = 32      # 批大小
     seq_len = 1  # 序列长度
+    # text_features = torch.randn(seq_len, bs, text_dim)
+    # video_features = torch.randn(seq_len, bs, video_dim)
     text_features = torch.randn(seq_len, bs, text_dim)
     video_features = torch.randn(seq_len, bs, video_dim)
-
     cross_attention = CrossAttention(128, 128, num_heads)
+    print(video_features.shape, text_features.shape)
     fused_output = cross_attention(text_features, video_features)
     print(fused_output.shape)
 

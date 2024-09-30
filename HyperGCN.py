@@ -279,7 +279,7 @@ if __name__ == '__main__':
     args.dropout = 0.1  # 网络深度
     args.c = 3  # 类别数量
     args.cuda = False  # 是否使用CUDA（依据您的系统配置而定）
-    args.fast = False  # 是否使用快速模式
+    args.fast = True  # 是否使用快速模式
     args.mediators = False  # 是否使用mediators
     args.dataset = 'custom'  # 数据集名称
 
