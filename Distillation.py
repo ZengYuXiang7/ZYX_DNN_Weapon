@@ -39,8 +39,7 @@ class StudentModel(nn.Module):
 
 # 定义蒸馏损失函数
 def distillation_loss(student_logits, labels, teacher_logits, temperature, alpha):
-    soft_loss = nn.KLDivLoss(reduction='batchmean')(F.log_softmax(student_logits / temperature, dim=1),
-                                                     F.softmax(teacher_logits / temperature, dim=1)) * (alpha * temperature * temperature)
+    soft_loss = nn.KLDivLoss(reduction='batchmean')(F.log_softmax(student_logits / temperature, dim=1), F.softmax(teacher_logits / temperature, dim=1)) * (alpha * temperature * temperature)
     hard_loss = F.cross_entropy(student_logits, labels) * (1. - alpha)
     return soft_loss + hard_loss
 

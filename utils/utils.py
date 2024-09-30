@@ -9,7 +9,6 @@ import platform
 import torch as t
 import numpy as np
 
-
 def set_settings(args):
     if args.debug:
         args.rounds = 2
@@ -20,17 +19,34 @@ def set_settings(args):
         args.bs = 1
         args.experiment = 0
 
-    if args.experiment:
-        args.record = 1
-
-    if platform.system() == 'Linux':
-        args.program_test = 1
-        args.verbose = 10
-        args.experiment = 1
-
     if args.classification:
         args.loss_func = 'CrossEntropyLoss'
 
+    def find_closest_power_of_2(train_size, percentage=0.10):
+        # 计算目标 batch size
+        target_bs = int(train_size * percentage)
+
+        # 定义 2 的幂次序列
+        powers_of_2 = [2 ** i for i in range(1, 15)]  # 2, 4, 8, ..., 256
+
+        # 找到最接近的 2 的幂次
+        closest_bs = min(powers_of_2, key=lambda x: abs(x - target_bs))
+
+        return closest_bs
+
+    # 找到最接近的 batch size
+    if args.train_size <= 10000:
+        args.bs = find_closest_power_of_2(args.train_size)
+
+    # 检查操作系统
+    if platform.system() == "Darwin":  # "Darwin" 是 macOS 的系统标识
+        args.device = 'cpu' if args.device != 'mps' else 'mps'
+
+    else:
+        # 如果不是 macOS，你可以选择默认设置为 CPU 或 GPU
+        args.device = "cuda" if t.cuda.is_available() else "cpu"
+
+    
     return args
 
 
@@ -42,6 +58,8 @@ def set_seed(seed):
     t.cuda.manual_seed(seed)
     t.cuda.manual_seed_all(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
+    t.backends.cudnn.deterministic = True
+    t.backends.cudnn.benchmark = False
 
 
 def to_cuda(inputs, values):
@@ -100,6 +118,8 @@ def computer_info():
     showinfo('计算机名称', platform.node())
     showinfo('处理器类型', platform.processor())
     showinfo('计算机相关信息', platform.uname())
+
+
 
 
 #########################################################################
